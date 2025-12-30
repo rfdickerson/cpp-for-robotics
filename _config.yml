@@ -5,8 +5,11 @@ description: Modern, safe, and clean control software for the physical world
 markdown: kramdown
 highlighter: rouge
 
-kramdown
+kramdown:
   syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    line_numbers: true
+    css_class: 'highlight'
 
 include:
   - assets
