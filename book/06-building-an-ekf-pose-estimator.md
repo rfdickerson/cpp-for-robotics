@@ -1,19 +1,20 @@
-# Chapter 6  
+# Chapter 6
+
 ## Building an EKF Pose Estimator (Library-First)
 
-Robots never know where they are.
+Robots never know exactly where they are.
 
 They estimate.
 
 This chapter builds a **production-quality Extended Kalman Filter (EKF) pose estimator** for a differential-drive robot, written as a **standalone modern C++ library**. No middleware. No callbacks. No magic.
 
 By the end of this chapter, you will have:
-- A reusable pose estimation core
-- Explicit state, covariance, and time handling
-- Deterministic prediction and correction steps
-- Clear trust boundaries between sensors and belief
+* A reusable pose estimation core
+* Explicit state, covariance, and time handling
+* Deterministic prediction and correction steps
+* Clear trust boundaries between sensors and belief
 
-This is not a SLAM system.  
+This is not a SLAM system.
 This is the *foundation SLAM systems are built on*.
 
 ---
@@ -24,17 +25,20 @@ We work in **SE(2)**: planar motion with orientation.
 
 Our state vector is:
 
-x = [x, y \theta]^T
+$$
+\mathbf{x} =
+\begin{bmatrix}
+x \\
+y \\
+	heta
+\end{bmatrix}
+$$
 
 Where:
-- `x, y` are position in meters
-- `θ` is heading in radians
+* $x, y$ are position in meters
+* $\theta$ is heading in radians
 
-We also track a **covariance matrix**:
-
-Which represents our uncertainty about the state.
-
-Which represents our uncertainty about the state.
+We also track a **covariance matrix** $\mathbf{P} \in \mathbb{R}^{3\times 3}$, which represents our uncertainty about the state.
 
 ---
 
@@ -42,12 +46,12 @@ Which represents our uncertainty about the state.
 
 Before writing code, we lock in constraints:
 
-- **No hidden state**
-- **Explicit timestamps**
-- **Prediction and correction are separate**
-- **Units enforced at the API boundary**
-- **Deterministic execution**
-- **No dynamic allocation in the hot path**
+* **No hidden state**
+* **Explicit timestamps**
+* **Prediction and correction are separate**
+* **Units enforced at the API boundary**
+* **Deterministic execution**
+* **No dynamic allocation in the hot path**
 
 If a design violates one of these, it does not ship.
 
@@ -57,12 +61,14 @@ If a design violates one of these, it does not ship.
 
 We structure the estimator as a small, focused module:
 
+```text
 estimation/
 ├── pose2.hpp
 ├── covariance.hpp
 ├── ekf.hpp
 ├── motion_model.hpp
 ├── measurement.hpp
+```
 
 This keeps concerns isolated and testable.
 
@@ -73,13 +79,13 @@ This keeps concerns isolated and testable.
 We start with strong types.
 
 ```cpp
+#include <array>
+
 struct Pose2 {
     units::Meters x{0.0};
     units::Meters y{0.0};
     units::Radians yaw{0.0};
 };
-
-#include <array>
 
 struct Covariance3 {
     // Row-major 3x3
@@ -100,12 +106,11 @@ struct Covariance3 {
 
 ```
 
-No linear algebra library yet.
-This keeps the math visible and auditable.
+No linear algebra library yet. This keeps the math visible and auditable.
 
 ## The EKF State object
 
-The EKS owns _belief_, not sensors.
+The EKF owns *belief*, not sensors.
 
 ```cpp
 struct EkfState {
