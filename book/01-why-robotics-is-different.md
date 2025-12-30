@@ -70,3 +70,105 @@ In game engines, time often looks like this:
 
 ```cpp
 float delta_time;
+```
+
+In robotics, time is a contract.
+
+Sensors arrive at irregular intervals.
+Controllers run at fixed rates.
+Messages are delayed.
+Clocks drift.
+Latency is unavoidable.
+
+If time is implicit in your API, your code is lying.
+
+Every serious robotics function should answer at least one of these questions:
+
+At what time was this data valid?
+
+Over what interval does this apply?
+
+What happens if this update is late?
+
+Robotics software treats time the way distributed systems treat causality. You do not “assume now.” You prove now.
+
+Sensors Lie (Politely)
+
+A robot never knows where it is.
+
+It estimates.
+
+Encoders drift.
+IMUs bias.
+Cameras drop frames.
+GPS jumps.
+
+Sensors are not broken when this happens. They are behaving normally.
+
+Robotics software must be written under the assumption that:
+
+All measurements are noisy
+
+Some measurements are wrong
+
+Some measurements are late
+
+Some measurements are missing
+
+This is why robotics code separates:
+
+Measurement from state
+
+Prediction from correction
+
+Observation from belief
+
+If your architecture assumes perfect information, it will fail gracefully in simulation and catastrophically on hardware.
+
+## Control is State, Not a Formula
+
+A common misconception among software engineers is that control systems are “just math.”
+
+They are not.
+
+A controller is a state machine:
+
+- It remembers the past
+- It accumulates error
+- It reacts to trends
+- It must be reset deliberately
+
+A PID controller is not a function. It is an object with memory.
+
+This has architectural consequences:
+
+- Controllers must own their state
+- Updates must be explicit
+- Reset must be intentional
+- Saturation must be enforced
+
+In robotics, control code that “looks pure” but hides state internally is a liability.
+
+## Bounded Behavior Is a Design Requirement
+
+In many domains, limits are an afterthought.
+
+In robotics, limits _are the specification_.
+
+Every meaningful quantity should be bounded:
+
+- Velocity
+- Acceleration
+- Torque
+- Integral accumulation
+- Rate of change
+
+If you do not explicitly clamp values, the physical system will do it for you, usually by breaking something.
+
+Good robotics code does not ask:
+
+“What is the correct output?”
+
+It asks:
+
+> “What outputs are safe under all circumstances?”
