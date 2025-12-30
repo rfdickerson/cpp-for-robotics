@@ -4,6 +4,11 @@ layout: default
 
 <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
 
+<img src="{{ '/assets/images/cover.png' | relative_url }}"
+     alt="C++ for Robotics cover illustration"
+     style="max-width: 420px; width: 100%; display: block; margin: 2rem auto;" />
+
+
 # C++ for Robotics
 
 Modern, safe, and clean control software for the physical world.
