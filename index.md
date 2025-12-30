@@ -1,3 +1,9 @@
+---
+layout: default
+---
+
+<link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+
 # C++ for Robotics
 
 Modern, safe, and clean control software for the physical world.

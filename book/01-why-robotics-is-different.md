@@ -222,3 +222,8 @@ In the next chapters, we'll build this mindset into code:
 * End-to-end examples that run deterministically.
 
 We'll start with time, because if your notion of time is wrong, everything else follows it into the ditch.
+
+---
+
+← [Chapter 2: The Mental Shift](02-the-mental-shift.html)  
+→ [Chapter 4: Units or It Didn’t Happen](04-units.html)

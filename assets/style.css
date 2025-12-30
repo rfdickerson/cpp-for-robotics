@@ -1,0 +1,50 @@
+/* Typography */
+body {
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  margin-top: 1.5em;
+}
+
+h2 {
+  margin-top: 2em;
+}
+
+/* Code blocks */
+pre, code {
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+  font-size: 0.95em;
+}
+
+pre {
+  padding: 1em;
+  border-radius: 6px;
+  background: #1e1e1e;
+  overflow-x: auto;
+}
+
+.highlight {
+  background: #1e1e1e;
+  color: #d4d4d4;
+}
+
+/* Inline code */
+code {
+  background: #f4f4f4;
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+}
+
+/* Blockquotes */
+blockquote {
+  border-left: 4px solid #999;
+  padding-left: 1em;
+  color: #555;
+  font-style: italic;
+}

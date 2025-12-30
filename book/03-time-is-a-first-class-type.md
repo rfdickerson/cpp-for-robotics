@@ -165,3 +165,114 @@ struct Timestamped {
 };
 ```
 
+This allows you to:
+
+* Reject stale measurements
+* Detect time going backwards
+* Align data streams correctly
+* Perform interpolation or buffering safely
+
+If your system cannot answer “when was this true?”, it cannot reason correctly.
+
+## Interpolation Beats Extrapolation
+
+When control needs state at a specific time, interpolation is safe. Extrapolation is a gamble.
+
+A minimal time buffer:
+
+```cpp
+#include <deque>
+#include <optional>
+
+template <typename T>
+class TimeBuffer {
+public:
+    void push(Timestamped<T> sample) {
+        buffer_.push_back(sample);
+        while (buffer_.size() > max_size_) {
+            buffer_.pop_front();
+        }
+    }
+
+    std::optional<T> interpolate(units::Seconds t) const {
+        if (buffer_.size() < 2) {
+            return std::nullopt;
+        }
+
+        for (size_t i = 1; i < buffer_.size(); ++i) {
+            const auto& a = buffer_[i - 1];
+            const auto& b = buffer_[i];
+
+            if (a.timestamp.value() <= t.value() &&
+                t.value() <= b.timestamp.value()) {
+
+                const double alpha =
+                    (t - a.timestamp).value() /
+                    (b.timestamp - a.timestamp).value();
+
+                return a.value * (1.0 - alpha) +
+                       b.value * alpha;
+            }
+        }
+        return std::nullopt;
+    }
+
+private:
+    std::deque<Timestamped<T>> buffer_;
+    size_t max_size_{100};
+};
+
+```
+
+Interpolation is predictable.
+Extrapolation is how robots drive off tables.
+
+## Wall Time vs Monotonic Time
+
+Robotics software should never use wall-clock time for control.
+
+Wall clocks:
+
+* Jump
+* Drift
+* Synchronize
+* Lie
+
+Control loops must use monotonic time:
+
+* Always increasing
+* Immune to NTP corrections
+* Stable under load
+
+This distinction should exist in your API design, even if both map to the same underlying clock initially.
+
+## Time as a Safety Boundary
+
+Every time boundary is also a trust boundary.
+
+Questions your code should answer explicitly:
+
+* What happens if data is late?
+* What happens if data is missing?
+* What happens if time jumps?
+* What happens if time stalls?
+
+Silence is not acceptable.
+
+A robot should slow, stop, or enter a fault state when time assumptions are violated.
+
+## Summary
+
+Time is not a parameter.
+Time is a constraint.
+
+Robotics software that treats time as an afterthought will behave beautifully in simulation and dangerously in reality.
+
+By making time:
+
+* Explicit
+* Typed
+* Checked
+* Bounded
+
+you force correctness into the structure of your code.

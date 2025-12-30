@@ -1,0 +1,14 @@
+theme: minima
+title: C++ for Robotics
+description: Modern, safe, and clean control software for the physical world
+
+markdown: kramdown
+highlighter: rouge
+
+kramdown
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+
+include:
+  - assets
